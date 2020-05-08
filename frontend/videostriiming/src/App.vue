@@ -7,15 +7,13 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import pageLayout from "./pages/layout/Pagelayout.vue";
 
 
 export default {
   name: 'app',
   components: {
-    HelloWorld, pageLayout
-
+    pageLayout
   }
 
 }
