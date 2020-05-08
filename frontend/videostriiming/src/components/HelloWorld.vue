@@ -1,29 +1,5 @@
 <template>
     <div class="container">
-        <div class="page-header">
-            <h1>Tutorial: WebRTC in loopback with recording</h1>
-            <p>
-                This application shows a <i>WebRtcEndpoint</i> connected to itself
-                (loopback) where the media sent to server is recorded and then
-                played. Then, the recorded media (stored in the KMS file system) is
-                played again. Thus, in the server-side code of this application we
-                are using two media pipelines <a
-                    data-footer="The first pipeline performs a WebRTC loopback and the media is stored in the KMS file system. The second media pipeline is used to play the recorded media."
-                    data-title="Hello World with Recording" data-toggle="lightbox"
-                    href="img/pipelines.png">media
-                pipelines</a> (one for the loopback, and the other one the playback).
-                To run this demo follow these steps:
-            </p>
-            <ol>
-                <li>Open this page with a browser compliant with WebRTC anc
-                    click on <i>Start</i> button.
-                <li>Grant the access to the camera and microphone. After the
-                    SDP negotiation the loopback should start.
-                <li>Click on <i>Stop</i> to finish the communication.
-                <li>Click on <i>Play</i> to replay the recorded media.
-                </li>
-            </ol>
-        </div>
         <div class="row">
             <div class="col-md-12">
                 <input checked="checked" name="mode" type="radio"

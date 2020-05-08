@@ -12,13 +12,11 @@
 
 <script>
     import navbar from "@/components/Navbar.vue"
-    import HelloWorld from '@/components/HelloWorld.vue'
 
     export default {
         name: 'page-layout',
         components: {
-            navbar,
-            HelloWorld
+            navbar
         }
 
     }
