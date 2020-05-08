@@ -1,0 +1,13 @@
+package hajussys.videostriiming;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class VideostriimingApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}
