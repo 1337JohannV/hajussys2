@@ -1,43 +1,106 @@
 <template>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <input checked="checked" name="mode" type="radio"
-                       value="video-and-audio"> Video and audio <input name="mode"
-                                                                       type="radio" value="video-only"> Video only
-                <input
-                        name="mode" type="radio" value="audio-only"> Audio only
+    <div class="row m-0">
+        <div class="col">
+            <div class="row justify-content-center">
+                <div class="col-4 text-center">
+                    <h5>Select Streaming Type</h5>
+                </div>
             </div>
-        </div>
-        <div class="row">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col">
+                    <div class="btn-group w-100" role="group">
+                        <button 
+                            class="btn" 
+                            :class="{'btn-success': selectedType.videoAudio, 'btn-outline-dark': !selectedType.videoAudio}"
+                            v-on:click="changeStreamingType(0)"
+                        >
+                            Video and audio
+                        </button>
+                        <button 
+                            class="btn" 
+                            :class="{'btn-success': selectedType.video, 'btn-outline-dark': !selectedType.video}"
+                            v-on:click="changeStreamingType(1)"
+                        >
+                            Video only
+                        </button>
+                        <button 
+                            class="btn" 
+                            :class="{'btn-success': selectedType.audio, 'btn-outline-dark': !selectedType.audio}"
+                            v-on:click="changeStreamingType(2)"
+                        >
+                            Audio only
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-5 text-center">
                     <h3>Local stream</h3>
-                    <video autoplay height="360px" id="videoInput" poster="img/webrtc.png"
-                           width="480px"></video>
+                    <video 
+                        autoplay 
+                        height="360px" 
+                        id="videoInput"
+                        class="video-canvas"
+                        poster="img/webrtc.png"
+                        width="480px">
+                    </video>
                 </div>
-                <div class="col-md-2">
-                    <a @click="start" class="btn btn-success" href="#"
-                       id="start"><span
-                            class="glyphicon glyphicon-play"></span> Start</a><br> <br> <a
-                        @click="stop" class="btn btn-danger" href="#"
-                        id="stop"><span
-                        class="glyphicon glyphicon-stop"></span> Stop</a><br> <br> <a
-                        @click="play" class="btn btn-warning" href="#"
-                        id="play"><span
-                        class="glyphicon glyphicon-play-circle"></span> Play</a>
+                <div class="col-2 text-center">
+                    <div class="row">
+                        <div class="col m-2">
+                            <button 
+                                @click="start" 
+                                class="btn btn-success stream-button" 
+                                id="start">
+                                Start
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col m-2">
+                            <button
+                                @click="stop" 
+                                class="btn btn-danger stream-button" 
+                                id="stop">
+                                Stop
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col m-2">
+                            <button
+                                @click="play" 
+                                class="btn btn-warning stream-button" 
+                                id="play">
+                                Play
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-5 text-center">
                     <h3>Remote stream</h3>
-                    <video autoplay height="360px" id="videoOutput" poster="img/webrtc.png"
-                           width="480px"></video>
+                    <video 
+                        autoplay 
+                        height="360px" 
+                        id="videoOutput"
+                        class="video-canvas"
+                        poster="img/webrtc.png"
+                        width="480px">
+                    </video>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
-                    <label class="control-label" for="console">Console</label><br>
+                <div class="col-12">
+                    <h5 
+                        class="control-label text-center" 
+                        for="console">
+                        Console
+                    </h5>
                     <br>
-                    <div class="democonsole" id="console">
+                    <br>
+                    <div 
+                        class="democonsole" 
+                        id="console">
                         <ul></ul>
                     </div>
                 </div>
@@ -54,6 +117,11 @@
         name: 'HelloWorld',
         data: function () {
             return {
+                selectedType: {
+                    videoAudio: true,
+                    video: false,
+                    audio: false
+                },
                 ws: new WebSocket('wss://localhost:8443/recording'),
                 videoInput: null,
                 videoOutput: null,
@@ -76,6 +144,22 @@
             msg: String
         },
         methods: {
+            changeStreamingType(type){
+                this.selectedType.videoAudio = false;
+                this.selectedType.video = false;
+                this.selectedType.audio = false;
+                switch(type){
+                    case(0):
+                        this.selectedType.videoAudio = true;
+                        break;
+                    case(1):
+                        this.selectedType.video = true;
+                        break;
+                    case(2):
+                        this.selectedType.audio = true;
+                        break;
+                }
+            },
             start() {
                 console.log('Starting video call ...');
 
@@ -253,10 +337,12 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    h3 {
-        margin: 40px 0 0;
+    .stream-button {
+        min-width: 5rem;
     }
-
+    .video-canvas {
+        border: 1px solid black;
+    }
     ul {
         list-style-type: none;
         padding: 0;
