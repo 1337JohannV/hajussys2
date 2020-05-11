@@ -122,7 +122,7 @@
                     video: false,
                     audio: false
                 },
-                ws: new WebSocket('wss://localhost:8443/recording'),
+                ws: new WebSocket('ws://localhost:8443/recording'),
                 videoInput: null,
                 videoOutput: null,
                 webRtcPeer: null,

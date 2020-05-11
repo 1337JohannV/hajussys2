@@ -6,12 +6,15 @@ import org.kurento.client.KurentoClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 @EnableWebSocket
 @SpringBootApplication
+@CrossOrigin()
 public class VideostriimingApplication implements WebSocketConfigurer {
 
     @Bean
@@ -26,7 +29,7 @@ public class VideostriimingApplication implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(handler(), "/recording");
+        registry.addHandler(handler(), "/recording").setAllowedOrigins("*");
     }
 
     @Bean
