@@ -180,6 +180,7 @@ public class VideoHandler extends TextWebSocketHandler {
     private MediaProfileSpecType getMediaProfileFromMessage(JsonObject jsonMessage) {
 
         MediaProfileSpecType profile;
+        System.out.println(jsonMessage);
         switch (jsonMessage.get("mode").getAsString()) {
             case "audio-only":
                 profile = MediaProfileSpecType.WEBM_AUDIO_ONLY;

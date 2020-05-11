@@ -138,6 +138,34 @@
             this.videoInput = document.getElementById('videoInput');
             this.videoOutput = document.getElementById('videoOutput');
             this.setState(this.NO_CALL);
+            this.ws.onmessage =  (message) => {
+                let parsedMessage = JSON.parse(message.data);
+                console.info('Received message: ' + message.data);
+                switch (parsedMessage.id) {
+                    case 'startResponse':
+                        this.startResponse(parsedMessage);
+                        break;
+                    case 'playResponse':
+                        this.playResponse(parsedMessage);
+                        break;
+                    case 'playEnd':
+                        this.playEnd();
+                        break;
+                    case 'error':
+                        this.setState(this.NO_CALL);
+                        this.onError('Error message from server: ' + parsedMessage.message);
+                        break;
+                    case 'iceCandidate':
+                        this.webRtcPeer.addIceCandidate(parsedMessage.candidate, function(error) {
+                            if (error)
+                                return console.error('Error adding candidate: ' + error);
+                        });
+                        break;
+                    default:
+                        this.setState(this.NO_CALL);
+                        this.onError('Unrecognized message', parsedMessage);
+                }
+            }
         },
 
         props: {
@@ -176,10 +204,12 @@
 
                 this.webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options,
                     function (error) {
-                        if (error)
-                            return console.error(error);
-                        this.webRtcPeer.generateOffer(this.onOffer);
+                        if (error) {
+                            console.log(error, 'fk')
+                        }
                     });
+                this.webRtcPeer.generateOffer(this.onOffer);
+                console.log(this.webRtcPeer,'peer')
             },
 
             onOffer(error, offerSdp) {
@@ -189,7 +219,7 @@
                 const message = {
                     id: 'start',
                     sdpOffer: offerSdp,
-                    mode: $('input[name="mode"]:checked').val()
+                    mode: 'video'
                 };
                 this.sendMessage(message);
             },
@@ -214,6 +244,7 @@
 
                 this.webRtcPeer.processAnswer(message.sdpAnswer, function (error) {
                     if (error)
+                        console.log('start err')
                         return console.error(error);
                 });
             },
