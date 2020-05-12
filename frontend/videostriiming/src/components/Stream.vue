@@ -50,7 +50,9 @@
                             <button 
                                 @click="start" 
                                 class="btn btn-success stream-button" 
-                                id="start">
+                                id="start"
+                                :disabled="buttonDisabled.start"
+                                >
                                 Start
                             </button>
                         </div>
@@ -60,7 +62,9 @@
                             <button
                                 @click="stop" 
                                 class="btn btn-danger stream-button" 
-                                id="stop">
+                                id="stop"
+                                :disabled="buttonDisabled.stop"
+                                >
                                 Stop
                             </button>
                         </div>
@@ -70,7 +74,9 @@
                             <button
                                 @click="play" 
                                 class="btn btn-warning stream-button" 
-                                id="play">
+                                id="play"
+                                :disabled="buttonDisabled.play"
+                                >
                                 Play
                             </button>
                         </div>
@@ -90,14 +96,12 @@
             <div class="row">
                 <div class="col-12">
                     <h5 
-                        class="control-label text-center" 
+                        class="text-center" 
                         for="console">
                         Console
                     </h5>
-                    <br>
-                    <br>
                     <div 
-                        class="democonsole" 
+                        class="democonsole p-4" 
                         id="console">
                         <ul></ul>
                     </div>
@@ -109,10 +113,11 @@
 
 <script>
     import * as kurentoUtils from "kurento-utils";
+    import constants from "../utils/constants";
     import $ from 'jquery'
 
     export default {
-        name: 'HelloWorld',
+        name: 'stream',
         data: function () {
             return {
                 selectedType: {
@@ -120,52 +125,18 @@
                     video: false,
                     audio: false
                 },
+                buttonDisabled: {
+                    start: false,
+                    stop: false,
+                    play: false
+                },
                 ws: new WebSocket('ws://localhost:8443/recording'),
-                videoInput: null,
-                videoOutput: null,
+                videoInput: document.getElementById('videoInput'),
+                videoOutput: document.getElementById('videoOutput'),
                 webRtcPeer: null,
-                state: null,
-                NO_CALL: 0,
-                IN_CALL: 1,
-                POST_CALL: 2,
-                DISABLED: 3,
-                IN_PLAY: 4
+                state: null
             }
         },
-        mounted() {
-            this.videoInput = document.getElementById('videoInput');
-            this.videoOutput = document.getElementById('videoOutput');
-            this.setState(this.NO_CALL);
-            this.ws.onmessage =  (message) => {
-                let parsedMessage = JSON.parse(message.data);
-                console.info('Received message: ' + message.data);
-                switch (parsedMessage.id) {
-                    case 'startResponse':
-                        this.startResponse(parsedMessage);
-                        break;
-                    case 'playResponse':
-                        this.playResponse(parsedMessage);
-                        break;
-                    case 'playEnd':
-                        this.playEnd();
-                        break;
-                    case 'error':
-                        this.setState(this.NO_CALL);
-                        this.onError('Error message from server: ' + parsedMessage.message);
-                        break;
-                    case 'iceCandidate':
-                        this.webRtcPeer.addIceCandidate(parsedMessage.candidate, function(error) {
-                            if (error)
-                                return console.error('Error adding candidate: ' + error);
-                        });
-                        break;
-                    default:
-                        this.setState(this.NO_CALL);
-                        this.onError('Unrecognized message', parsedMessage);
-                }
-            }
-        },
-
         props: {
             msg: String
         },
@@ -190,7 +161,7 @@
                 console.log('Starting video call ...');
 
                 // Disable start button
-                this.setState(this.DISABLED);
+                this.setState(constants.DISABLED);
                 console.log('Creating WebRtcPeer and generating local sdp offer ...');
 
                 var options = {
@@ -238,7 +209,7 @@
             },
 
             startResponse(message) {
-                this.setState(this.IN_CALL);
+                this.setState(constants.IN_CALL);
                 console.log('SDP answer received from server. Processing ...');
 
                 this.webRtcPeer.processAnswer(message.sdpAnswer, function (error) {
@@ -249,9 +220,9 @@
             },
 
             stop() {
-                const stopMessageId = (this.state === this.IN_CALL) ? 'stop' : 'stopPlay';
+                const stopMessageId = (this.state === constants.IN_CALL) ? 'stop' : 'stopPlay';
                 console.log('Stopping video while in ' + this.state + '...');
-                this.setState(this.POST_CALL);
+                this.setState(constants.POST_CALL);
                 if (this.webRtcPeer) {
                     this.webRtcPeer.dispose();
                     this.webRtcPeer = null;
@@ -267,7 +238,7 @@
                 console.log("Starting to play recorded video...");
 
                 // Disable start button
-                this.setState(this.DISABLED);
+                this.setState(constants.DISABLED);
                 console.log('Creating WebRtcPeer and generating local sdp offer ...');
 
                 const options = {
@@ -312,7 +283,7 @@
             },
 
             playResponse(message) {
-                this.setState(this.IN_PLAY);
+                this.setState(constants.IN_PLAY);
                 this.webRtcPeer.processAnswer(message.sdpAnswer, function (error) {
                     if (error)
                         return console.error(error);
@@ -320,7 +291,7 @@
             },
 
             playEnd() {
-                this.setState(this.POST_CALL);
+                this.setState(constants.POST_CALL);
             },
 
             sendMessage(message) {
@@ -330,30 +301,30 @@
             },
             setState(nextState) {
                 switch (nextState) {
-                    case this.NO_CALL:
-                        $('#start').attr('disabled', false);
-                        $('#stop').attr('disabled', true);
-                        $('#play').attr('disabled', true);
+                    case constants.NO_CALL:
+                        this.buttonDisabled.start = false;
+                        this.buttonDisabled.stop = true;
+                        this.buttonDisabled.play = true;
                         break;
-                    case this.DISABLED:
-                        $('#start').attr('disabled', true);
-                        $('#stop').attr('disabled', true);
-                        $('#play').attr('disabled', true);
+                    case constants.DISABLED:
+                        this.buttonDisabled.start = true;
+                        this.buttonDisabled.stop = true;
+                        this.buttonDisabled.play = true;
                         break;
-                    case this.IN_CALL:
-                        $('#start').attr('disabled', true);
-                        $('#stop').attr('disabled', false);
-                        $('#play').attr('disabled', true);
+                    case constants.IN_CALL:
+                        this.buttonDisabled.start = true;
+                        this.buttonDisabled.stop = false;
+                        this.buttonDisabled.play = true;
                         break;
-                    case this.POST_CALL:
-                        $('#start').attr('disabled', false);
-                        $('#stop').attr('disabled', true);
-                        $('#play').attr('disabled', false);
+                    case constants.POST_CALL:
+                        this.buttonDisabled.start = false;
+                        this.buttonDisabled.stop = true;
+                        this.buttonDisabled.play = false;
                         break;
-                    case this.IN_PLAY:
-                        $('#start').attr('disabled', true);
-                        $('#stop').attr('disabled', false);
-                        $('#play').attr('disabled', true);
+                    case constants.IN_PLAY:
+                        this.buttonDisabled.start = true;
+                        this.buttonDisabled.stop = false;
+                        this.buttonDisabled.play = true;
                         break;
                     default:
                         this.onError('Unknown state ' + nextState);
@@ -361,7 +332,38 @@
                 }
                 this.state = nextState;
             }
-        }
+        },
+        mounted() {
+            this.setState(constants.NO_CALL);
+            this.ws.onmessage =  (message) => {
+                let parsedMessage = JSON.parse(message.data);
+                console.info('Received message: ' + message.data);
+                switch (parsedMessage.id) {
+                    case 'startResponse':
+                        this.startResponse(parsedMessage);
+                        break;
+                    case 'playResponse':
+                        this.playResponse(parsedMessage);
+                        break;
+                    case 'playEnd':
+                        this.playEnd();
+                        break;
+                    case 'error':
+                        this.setState(constants.NO_CALL);
+                        this.onError('Error message from server: ' + parsedMessage.message);
+                        break;
+                    case 'iceCandidate':
+                        this.webRtcPeer.addIceCandidate(parsedMessage.candidate, function(error) {
+                            if (error)
+                                return console.error('Error adding candidate: ' + error);
+                        });
+                        break;
+                    default:
+                        this.setState(constants.NO_CALL);
+                        this.onError('Unrecognized message', parsedMessage);
+                }
+            }
+        },
     }
 </script>
 
