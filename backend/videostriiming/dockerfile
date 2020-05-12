@@ -1,0 +1,9 @@
+FROM gradle:jdk11
+RUN apt-get -q update && apt-get -qy install netcat
+WORKDIR /be
+
+COPY . /be
+
+EXPOSE 8443
+
+

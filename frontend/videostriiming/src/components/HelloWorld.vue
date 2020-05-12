@@ -41,7 +41,6 @@
                         height="360px" 
                         id="videoInput"
                         class="video-canvas"
-                        poster="img/webrtc.png"
                         width="480px">
                     </video>
                 </div>
@@ -84,7 +83,6 @@
                         height="360px" 
                         id="videoOutput"
                         class="video-canvas"
-                        poster="img/webrtc.png"
                         width="480px">
                     </video>
                 </div>
@@ -204,6 +202,7 @@
 
                 this.webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options,
                     function (error) {
+                        console.log(error, 'fk')
                         if (error) {
                             console.log(error, 'fk')
                         }
@@ -219,7 +218,7 @@
                 const message = {
                     id: 'start',
                     sdpOffer: offerSdp,
-                    mode: 'video'
+                    mode: 'video-only'
                 };
                 this.sendMessage(message);
             },

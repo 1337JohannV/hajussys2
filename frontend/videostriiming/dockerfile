@@ -1,0 +1,7 @@
+FROM node
+
+WORKDIR /usr/fe
+
+COPY . .
+
+EXPOSE 6969

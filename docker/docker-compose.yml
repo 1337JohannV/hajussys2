@@ -1,0 +1,66 @@
+version: "3.7"
+services:
+
+  turn-server:
+    image: instrumentisto/coturn
+    network_mode: host
+    ports:
+      - 3478:3478
+    environment:
+      user: "user:pass"
+
+  kms:
+    container_name: kurento-ms
+    image: kurento/kurento-media-server
+    stdin_open: true
+    environment:
+      KMS_STUN_IP: 173.194.66.127
+      KMS_STUN_PORT: 19302
+      KMS_TURN_URL: "user:pass@turn-server:3478"
+    ports:
+      - 8888:8888
+    networks:
+      - net
+    depends_on:
+      - turn-server
+
+  backend:
+    container_name: backend-video
+    build:
+      context: ../backend/videostriiming
+      dockerfile: dockerfile
+    volumes:
+      - ../backend/videostriiming:/be
+    ports:
+      - 8443:8443
+    depends_on:
+     - kms
+    command: sh -c './wait-for kms:8888 -- gradle bootRun'
+    restart: unless-stopped
+    networks:
+      - net
+
+  frontend:
+    container_name: frontend-video
+    build:
+      context: ../frontend/videostriiming
+      dockerfile: dockerfile
+    ports:
+      - 6969:6969
+    volumes:
+      - ../frontend/videostriiming:/usr/fe
+    stdin_open: true
+    tty: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - kms
+      - backend
+    command: sh -c './wait-for backend:8443 -- npm run serve'
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
+
