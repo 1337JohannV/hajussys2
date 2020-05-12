@@ -18,7 +18,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 @SpringBootApplication
 public class VideostriimingApplication implements WebSocketConfigurer {
-    static final String KMS_URL = "ws://192.168.0.24:8888/kurento";
+    static final String KMS_URL = "ws://localhost:8888/kurento";
     @Bean
     public VideoHandler handler() {
         return new VideoHandler();
