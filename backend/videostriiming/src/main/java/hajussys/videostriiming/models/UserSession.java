@@ -1,18 +1,26 @@
 package hajussys.videostriiming.models;
 
-import com.google.gson.JsonObject;
+import java.io.IOException;
+import java.util.Date;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.kurento.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import com.google.gson.JsonObject;
 
-public class Session {
+/**
+ * User session.
+ *
+ * @author Boni Garcia (bgarcia@gsyc.es)
+ * @since 5.0.0
+ */
+public class UserSession {
+
     private static final Logger log = LoggerFactory.getLogger(UserSession.class);
 
     private final WebSocketSession session;
@@ -22,7 +30,7 @@ public class Session {
     private MediaPipeline mediaPipeline;
     private Date stopTimestamp;
 
-    public Session(WebSocketSession session) {
+    public UserSession(WebSocketSession session) {
         this.session = session;
         this.id = session.getId();
     }
@@ -73,22 +81,22 @@ public class Session {
         return stopTimestamp;
     }
 
-    public void stop() {
-        if (recorderEndpoint != null) {
-            final CountDownLatch stoppedCountDown = new CountDownLatch(1);
-            ListenerSubscription subscriptionId = recorderEndpoint
-                    .addStoppedListener(event -> stoppedCountDown.countDown());
-            recorderEndpoint.stop();
-            try {
-                if (!stoppedCountDown.await(5, TimeUnit.SECONDS)) {
-                    log.error("Error waiting for recorder to stop");
-                }
-            } catch (InterruptedException e) {
-                log.error("Exception while waiting for state change", e);
-            }
-            recorderEndpoint.removeStoppedListener(subscriptionId);
-        }
-    }
+//    public void stop() {
+//        if (recorderEndpoint != null) {
+//            final CountDownLatch stoppedCountDown = new CountDownLatch(1);
+//            ListenerSubscription subscriptionId = recorderEndpoint
+//                    .addStoppedListener(event -> stoppedCountDown.countDown());
+//            recorderEndpoint.stop();
+//            try {
+//                if (!stoppedCountDown.await(5, TimeUnit.SECONDS)) {
+//                    log.error("Error waiting for recorder to stop");
+//                }
+//            } catch (InterruptedException e) {
+//                log.error("Exception while waiting for state change", e);
+//            }
+//            recorderEndpoint.removeStoppedListener(subscriptionId);
+//        }
+//    }
 
     public void release() {
         this.mediaPipeline.release();
