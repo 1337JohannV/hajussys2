@@ -28,6 +28,14 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+
+    compile group: 'org.webjars', name: 'webjars-locator', version: '0.40'
+    compile group: 'org.webjars.bower', name: 'bootstrap', version: '4.1.0'
+    compile group: 'org.webjars.bower', name: 'ekko-lightbox', version: '4.0.2'
+    compile group: 'org.webjars.bower', name: 'webrtc-adapter', version: '7.4.0'
+    compile group: 'org.webjars.bower', name: 'jquery', version: '3.3.1'
+    compile group: 'org.kurento', name: 'kurento-utils-js', version: '6.13.1'
+    compile group: 'org.webjars.bower', name: 'demo-console', version: '1.5.1'
 }
 
 test {

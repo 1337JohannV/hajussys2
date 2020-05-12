@@ -62,13 +62,7 @@ public class Session {
         if (recorderEndpoint != null) {
             final CountDownLatch stoppedCountDown = new CountDownLatch(1);
             ListenerSubscription subscriptionId = recorderEndpoint
-                    .addStoppedListener(new EventListener<StoppedEvent>() {
-
-                        @Override
-                        public void onEvent(StoppedEvent event) {
-                            stoppedCountDown.countDown();
-                        }
-                    });
+                    .addStoppedListener(event -> stoppedCountDown.countDown());
             recorderEndpoint.stop();
             try {
                 if (!stoppedCountDown.await(5, TimeUnit.SECONDS)) {

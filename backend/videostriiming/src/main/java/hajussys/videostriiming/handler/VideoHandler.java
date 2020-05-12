@@ -59,11 +59,13 @@ public class VideoHandler extends TextWebSocketHandler {
                 break;
             case "onIceCandidate": {
                 JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
+                System.out.println("CANDIDATE" + jsonCandidate.toString());
 
                 if (user != null) {
                     IceCandidate candidate = new IceCandidate(jsonCandidate.get("candidate").getAsString(),
                             jsonCandidate.get("sdpMid").getAsString(),
                             jsonCandidate.get("sdpMLineIndex").getAsInt());
+                    System.out.println(candidate + " CAND");
                     user.addCandidate(candidate);
                 }
                 break;
@@ -143,20 +145,17 @@ public class VideoHandler extends TextWebSocketHandler {
             String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
 
             // 4. Gather ICE candidates
-            webRtcEndpoint.addIceCandidateFoundListener(new EventListener<IceCandidateFoundEvent>() {
-
-                @Override
-                public void onEvent(IceCandidateFoundEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "iceCandidate");
-                    response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                    try {
-                        synchronized (session) {
-                            session.sendMessage(new TextMessage(response.toString()));
-                        }
-                    } catch (IOException e) {
-                        log.error(e.getMessage());
+            webRtcEndpoint.addIceCandidateFoundListener(event -> {
+                JsonObject response = new JsonObject();
+                response.addProperty("id", "iceCandidate");
+                response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
+                log.debug("added ice candidate");
+                try {
+                    synchronized (session) {
+                        session.sendMessage(new TextMessage(response.toString()));
                     }
+                } catch (IOException e) {
+                    log.error(e.getMessage());
                 }
             });
 
