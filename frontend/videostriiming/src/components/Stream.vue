@@ -114,7 +114,6 @@
 <script>
     import * as kurentoUtils from "kurento-utils";
     import constants from "../utils/constants";
-    import $ from 'jquery'
 
     export default {
         name: 'stream',
@@ -137,9 +136,7 @@
                 state: null
             }
         },
-        props: {
-            msg: String
-        },
+
         methods: {
             changeStreamingType(type){
                 this.selectedType.videoAudio = false;
@@ -267,18 +264,23 @@
             },
 
             getConstraints() {
-                const mode = $('input[name="mode"]:checked').val();
                 const constraints = {
                     audio: true,
                     video: true
                 };
-
-                if (mode === 'video-only') {
-                    constraints.audio = false;
-                } else if (mode === 'audio-only') {
-                    constraints.video = false;
+                for(let key in this.selectedType){
+                    if(this.selectedType[key]){
+                        switch(key){
+                            case('audio'):
+                                constraints.video = false;
+                                break;
+                            case('video'):
+                                constraints.audio = false;
+                                break;
+                        }
+                        return constraints;
+                    }
                 }
-
                 return constraints;
             },
 
