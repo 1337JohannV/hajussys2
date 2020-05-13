@@ -57,14 +57,6 @@ public class VideoHandler extends TextWebSocketHandler {
                 if (user != null) {
                     user.stop();
                 }
-            case "stopPlay":
-                if (user != null) {
-                    user.release();
-                }
-                break;
-            case "play":
-                play(user, session, jsonMessage);
-                break;
             case "viewer":
                 log.info("CASE ON VIEWER!!!!!!!!!!!!!!!! {}", jsonMessage);
                 try {
@@ -127,6 +119,8 @@ public class VideoHandler extends TextWebSocketHandler {
                 MediaProfileSpecType profile = getMediaProfileFromMessage(jsonMessage);
 
                 RECORDER_FILE_PATH = String.format("file:///tmp/%s.webm", session.getId());
+                log.debug("SOCKET SESSION ID: {}", session.getId());
+                registry.addStream(session);
 
                 RecorderEndpoint recorder = new RecorderEndpoint.Builder(pipeline, RECORDER_FILE_PATH)
                         .withMediaProfile(profile).build();
@@ -258,88 +252,7 @@ public class VideoHandler extends TextWebSocketHandler {
         }
     }
 
-    private void play(Session user, final WebSocketSession session, JsonObject jsonMessage) {
-        try {
 
-            // 1. Media logic\
-
-            System.out.println(user + "USER");
-
-            final MediaPipeline pipeline = kurento.createMediaPipeline();
-            System.out.println("PIPELINE: " + pipeline);
-            WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
-            String path = jsonMessage.get("filepath") != null ? jsonMessage.get("filepath").getAsString() : null;
-            String pathString = String.format("file:///tmp/%s.webm", path);
-            System.out.println("PATHSTRING: "+pathString);
-            PlayerEndpoint player = new PlayerEndpoint
-                    .Builder(pipeline, path == null
-                    ? RECORDER_FILE_PATH : pathString ).build();
-            player.connect(webRtcEndpoint);
-
-            // Player listeners
-            player.addErrorListener(event -> {
-                log.info("ErrorEvent for session '{}': {}", session.getId(), event.getDescription());
-                sendPlayEnd(session, pipeline);
-            });
-            player.addEndOfStreamListener(event -> {
-                log.info("EndOfStreamEvent for session '{}'", session.getId());
-                sendPlayEnd(session, pipeline);
-            });
-
-            // 2. Store user session
-            if (user == null) {
-                user = new Session(session);
-            }
-            user.setMediaPipeline(pipeline);
-            user.setWebRtcEndpoint(webRtcEndpoint);
-
-            // 3. SDP negotiation
-            String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
-            String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
-
-            JsonObject response = new JsonObject();
-            response.addProperty("id", "playResponse");
-            response.addProperty("sdpAnswer", sdpAnswer);
-
-            // 4. Gather ICE candidates
-            webRtcEndpoint.addIceCandidateFoundListener(event -> {
-                JsonObject response1 = new JsonObject();
-                response1.addProperty("id", "iceCandidate");
-                response1.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                try {
-                    synchronized (session) {
-                        session.sendMessage(new TextMessage(response1.toString()));
-                    }
-                } catch (IOException e) {
-                    log.error(e.getMessage());
-                }
-            });
-
-            // 5. Play recorded stream
-            player.play();
-
-            synchronized (session) {
-                session.sendMessage(new TextMessage(response.toString()));
-            }
-
-            webRtcEndpoint.gatherCandidates();
-        } catch (Throwable t) {
-            log.error("Play error", t);
-            sendError(session, t.getMessage());
-        }
-    }
-
-    public void sendPlayEnd(WebSocketSession session, MediaPipeline pipeline) {
-        try {
-            JsonObject response = new JsonObject();
-            response.addProperty("id", "playEnd");
-            session.sendMessage(new TextMessage(response.toString()));
-        } catch (IOException e) {
-            log.error("Error sending playEndOfStream message", e);
-        }
-        // Release pipeline
-        pipeline.release();
-    }
 
     private void sendError(WebSocketSession session, String message) {
         try {
