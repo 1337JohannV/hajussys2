@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class Session {
-    private static final Logger log = LoggerFactory.getLogger(UserSession.class);
+    private static final Logger log = LoggerFactory.getLogger(Session.class);
 
     private final WebSocketSession session;
     private WebRtcEndpoint webRtcEndpoint;

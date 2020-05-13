@@ -20,14 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Protocol handler for video player through WebRTC.
- *
- * @author Boni Garcia (bgarcia@gsyc.es)
- * @author David Fernandez (dfernandezlop@gmail.com)
- * @author Ivan Gracia (igracia@kurento.org)
- * @since 6.1.1
- */
+
 public class PlayerHandler extends TextWebSocketHandler {
 
     @Autowired

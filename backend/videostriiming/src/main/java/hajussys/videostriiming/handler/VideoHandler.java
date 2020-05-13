@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import hajussys.videostriiming.models.Session;
-import hajussys.videostriiming.models.User;
-import hajussys.videostriiming.models.UserSession;
 import hajussys.videostriiming.registry.UserRegistry;
 import org.kurento.client.*;
 import org.kurento.jsonrpc.JsonUtils;
@@ -18,14 +16,11 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class VideoHandler extends TextWebSocketHandler {
     private String RECORDER_FILE_PATH;
     private static final Gson gson = new GsonBuilder().create();
     private final Logger log = LoggerFactory.getLogger(VideoHandler.class);
-    private final ConcurrentHashMap<String, UserSession> viewers = new ConcurrentHashMap<>();
-
 
     @Autowired
     private UserRegistry registry;
@@ -333,12 +328,6 @@ public class VideoHandler extends TextWebSocketHandler {
         log.info("REMOVING VIEW SESSION");
         String sessionId = session.getId();
         if (presenterUserSession != null && presenterUserSession.getSession().getId().equals(sessionId)) {
-            for (UserSession viewer : viewers.values()) {
-                JsonObject response = new JsonObject();
-                response.addProperty("id", "stopCommunication");
-                viewer.sendMessage(response);
-            }
-
             log.info("Releasing media pipeline");
             if (pipeline != null) {
                 pipeline.release();
