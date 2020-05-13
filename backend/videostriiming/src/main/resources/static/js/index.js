@@ -18,6 +18,7 @@
 var ws = new WebSocket('ws://' + "localhost:8443" + '/recording');
 var videoInput;
 var videoOutput;
+var videoOutput2;
 var webRtcPeer;
 var state;
 
@@ -27,11 +28,29 @@ const POST_CALL = 2;
 const DISABLED = 3;
 const IN_PLAY = 4;
 
+
+
+
 window.onload = function() {
 	console.log('Page loaded ...');
 	videoInput = document.getElementById('videoInput');
 	videoOutput = document.getElementById('videoOutput');
+	videoOutput2 = document.getElementById('videoOutput2');
 	setState(NO_CALL);
+
+
+    // var options = {
+    //     remoteVideo : videoOutput2,
+    //     mediaConstraints : getConstraints(),
+    //     onicecandidate : onIceCandidate
+    // };
+    //
+    // webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly(options,
+    //     function(error) {
+    //         if (error)
+    //             return console.error(error);
+    //         webRtcPeer.generateOffer(onPlayOffer);
+    //     });
 }
 
 window.onbeforeunload = function() {
@@ -80,6 +99,9 @@ ws.onmessage = function(message) {
 	case 'startResponse':
 		startResponse(parsedMessage);
 		break;
+	case 'viewerResponse':
+		viewerResponse(parsedMessage);
+		break;
 	case 'playResponse':
 		playResponse(parsedMessage);
 		break;
@@ -106,6 +128,82 @@ ws.onmessage = function(message) {
 		setState(NO_CALL);
 	onError('Unrecognized message', parsedMessage);
 	}
+}
+
+function presenter() {
+    if (!webRtcPeer) {
+        showSpinner(videoOutput2);
+
+        var options = {
+            localVideo : videoOutput2,
+            onicecandidate : onIceCandidate
+        }
+        webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendonly(options,
+            function(error) {
+                if (error) {
+                    return console.error(error);
+                }
+                webRtcPeer.generateOffer(onOfferPresenter);
+            });
+
+        // enableStopButton();
+    }
+}
+
+function viewerResponse(message) {
+    if (message.response != 'accepted') {
+        var errorMsg = message.message ? message.message : 'Unknow error';
+        console.info('Call not accepted for the following reason: ' + errorMsg);
+        dispose();
+    } else {
+        webRtcPeer.processAnswer(message.sdpAnswer, function(error) {
+            if (error)
+                return console.error(error);
+        });
+    }
+}
+
+function viewer() {
+    if (!webRtcPeer) {
+        showSpinner(videoOutput2);
+
+        var options = {
+            remoteVideo : videoOutput2,
+            onicecandidate : onIceCandidate
+        }
+        webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly(options,
+            function(error) {
+                if (error) {
+                    return console.error(error);
+                }
+                this.generateOffer(onOfferViewer);
+            });
+
+        // enableStopButton();
+    }
+}
+
+function onOfferViewer(error, offerSdp) {
+    if (error)
+        return console.error('Error generating the offer');
+    console.info('Invoking SDP offer callback function ' + location.host);
+    var message = {
+        id : 'viewer',
+        sdpOffer : offerSdp
+    }
+    sendMessage(message);
+}
+
+
+function onOfferPresenter(error, offerSdp) {
+    if (error)
+        return console.error('Error generating the offer');
+    console.info('Invoking SDP offer callback function ' + location.host);
+    var message = {
+        id : 'presenter',
+        sdpOffer : offerSdp
+    }
+    sendMessage(message);
 }
 
 function start() {
