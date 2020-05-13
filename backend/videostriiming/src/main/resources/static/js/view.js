@@ -136,7 +136,7 @@ function onIceCandidate(candidate) {
 
 function stop() {
     var message = {
-        id : 'stop'
+        id : 'stopView'
     }
     sendMessage(message);
     dispose();

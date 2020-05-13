@@ -57,6 +57,9 @@ public class VideoHandler extends TextWebSocketHandler {
                 if (user != null) {
                     user.stop();
                 }
+            case "stopView":
+                stop(session);
+                break;
             case "viewer":
                 log.info("CASE ON VIEWER!!!!!!!!!!!!!!!! {}", jsonMessage);
                 try {
@@ -95,6 +98,7 @@ public class VideoHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        stop(session);
         super.afterConnectionClosed(session, status);
         registry.removeBySession(session);
     }
@@ -324,4 +328,29 @@ public class VideoHandler extends TextWebSocketHandler {
         }
     }
 
+
+    private synchronized void stop(WebSocketSession session) throws IOException {
+        log.info("REMOVING VIEW SESSION");
+        String sessionId = session.getId();
+        if (presenterUserSession != null && presenterUserSession.getSession().getId().equals(sessionId)) {
+            for (UserSession viewer : viewers.values()) {
+                JsonObject response = new JsonObject();
+                response.addProperty("id", "stopCommunication");
+                viewer.sendMessage(response);
+            }
+
+            log.info("Releasing media pipeline");
+            if (pipeline != null) {
+                pipeline.release();
+            }
+            pipeline = null;
+            presenterUserSession = null;
+        } else if (registry.getById(sessionId) != null) {
+            if (registry.getById(sessionId).getWebRtcEndpoint() != null) {
+                registry.getById(sessionId).getWebRtcEndpoint().release();
+            }
+
+            registry.removeBySession(session);
+        }
+    }
 }
