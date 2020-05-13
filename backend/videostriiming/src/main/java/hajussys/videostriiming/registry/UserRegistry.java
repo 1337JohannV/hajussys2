@@ -41,4 +41,8 @@ public class UserRegistry {
         return user;
     }
 
+    public Session removeById(String id) {
+        return usersBySessionId.remove(id);
+    }
+
 }

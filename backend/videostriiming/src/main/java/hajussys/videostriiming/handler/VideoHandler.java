@@ -51,6 +51,7 @@ public class VideoHandler extends TextWebSocketHandler {
             case "stop":
                 if (user != null) {
                     user.stop();
+                    sendStopToViewers();
                 }
             case "stopView":
                 stop(session);
@@ -91,6 +92,23 @@ public class VideoHandler extends TextWebSocketHandler {
         }
     }
 
+    private void sendStopToViewers() {
+        for (Session session : registry.usersBySessionId.values()) {
+            if (session != presenterUserSession) {
+                JsonObject response = new JsonObject();
+                response.addProperty("id", "stopCommunication");
+                try {
+                    session.sendMessage(response);
+                    session.getWebRtcEndpoint().release();
+
+                    registry.removeById(session.getId());
+                } catch (IOException e) {
+                    log.info("ERROR Sending stop message to viewer");
+                }
+            }
+        }
+    }
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         stop(session);
@@ -106,9 +124,6 @@ public class VideoHandler extends TextWebSocketHandler {
                 presenterUserSession = new Session(session);
 
                 pipeline = kurento.createMediaPipeline();
-                log.info("MINGI TÜRA ÜRASK {}", presenterUserSession);
-                log.info("MINGI TÜRA ÜRASK pipeline: {}", pipeline);
-
                 presenterUserSession.setWebRtcEndpoint(new WebRtcEndpoint.Builder(pipeline).build());
                 WebRtcEndpoint webRtcEndpoint = presenterUserSession.getWebRtcEndpoint();
 
@@ -250,7 +265,6 @@ public class VideoHandler extends TextWebSocketHandler {
                 throw new UnsupportedOperationException("Unsupported profile for this tutorial: " + profile);
         }
     }
-
 
 
     private void sendError(WebSocketSession session, String message) {
