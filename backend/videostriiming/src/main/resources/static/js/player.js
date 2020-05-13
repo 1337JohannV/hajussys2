@@ -282,14 +282,14 @@ $(document).delegate('*[data-toggle="lightbox"]', 'click', function (event) {
 
 function displayStreams(array) {
     for (let i = 0; i < array.length; i++) {
-        console.log(array[i], "arr element");
         const nodeContainer = document.createElement("DIV");
         let node = document.createElement('a');
         node.classList.add("py-1", "btn", "btn-link");
-        node.innerText = array[i];
+        node.innerText = array[i].date;
+        const videoUrl = `file:///tmp/${array[i].id}.webm`
         node.setAttribute('tabindex', '0');
         node.addEventListener('click', function () {
-            urlValue = `file:///tmp/${node.innerText}.webm`;
+            urlValue = videoUrl;
             document.getElementById('videourl').value = urlValue;
         });
         nodeContainer.appendChild(node);

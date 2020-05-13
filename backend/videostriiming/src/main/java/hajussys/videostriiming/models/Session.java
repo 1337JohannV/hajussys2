@@ -1,6 +1,7 @@
 package hajussys.videostriiming.models;
 
 import com.google.gson.JsonObject;
+import lombok.Data;
 import org.kurento.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+@Data
 public class Session {
     private static final Logger log = LoggerFactory.getLogger(Session.class);
 
@@ -22,14 +24,12 @@ public class Session {
     private MediaPipeline mediaPipeline;
     private Date stopTimestamp;
     private PlayerEndpoint playerEndpoint;
+    private Date startTimeStamp;
 
     public Session(WebSocketSession session) {
         this.session = session;
         this.id = session.getId();
-    }
-
-    public WebSocketSession getSession() {
-        return session;
+        this.startTimeStamp = new Date();
     }
 
     public void sendMessage(JsonObject message) throws IOException {
@@ -37,45 +37,8 @@ public class Session {
         session.sendMessage(new TextMessage(message.toString()));
     }
 
-    public WebRtcEndpoint getWebRtcEndpoint() {
-        return webRtcEndpoint;
-    }
-
-    public void setWebRtcEndpoint(WebRtcEndpoint webRtcEndpoint) {
-        this.webRtcEndpoint = webRtcEndpoint;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-
-    public void setRecorderEndpoint(RecorderEndpoint recorderEndpoint) {
-        this.recorderEndpoint = recorderEndpoint;
-    }
-    public void setPlayerEndpoint (PlayerEndpoint playerEndpoint) {this.playerEndpoint = playerEndpoint;}
-    public PlayerEndpoint getPlayerEndpoint() {
-        return this.playerEndpoint;
-    }
-
-    public MediaPipeline getMediaPipeline() {
-        return mediaPipeline;
-    }
-
-    public void setMediaPipeline(MediaPipeline mediaPipeline) {
-        this.mediaPipeline = mediaPipeline;
-    }
-
     public void addCandidate(IceCandidate candidate) {
         webRtcEndpoint.addIceCandidate(candidate);
-    }
-
-    public Date getStopTimestamp() {
-        return stopTimestamp;
     }
 
     public void stop() {

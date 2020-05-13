@@ -1,5 +1,6 @@
 package hajussys.videostriiming.registry;
 
+import hajussys.videostriiming.models.FileModel;
 import hajussys.videostriiming.models.Session;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -11,10 +12,10 @@ public class UserRegistry {
 
     public ConcurrentHashMap<String, Session> usersBySessionId = new ConcurrentHashMap<>();
 
-    public List<String> pastStreams = new ArrayList<>();
+    public List<FileModel> pastStreams = new ArrayList<>();
 
-    public void addStream(WebSocketSession session) {
-        pastStreams.add(session.getId());
+    public void addStream(FileModel fileModel) {
+        pastStreams.add(fileModel);
     }
 
     public void register(Session user) {

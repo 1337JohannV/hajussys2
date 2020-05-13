@@ -3,6 +3,7 @@ package hajussys.videostriiming.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import hajussys.videostriiming.models.FileModel;
 import hajussys.videostriiming.models.Session;
 import hajussys.videostriiming.registry.UserRegistry;
 import org.kurento.client.*;
@@ -134,7 +135,8 @@ public class VideoHandler extends TextWebSocketHandler {
 
                 RECORDER_FILE_PATH = String.format("file:///tmp/%s.webm", session.getId());
                 log.debug("SOCKET SESSION ID: {}", session.getId());
-                registry.addStream(session);
+                FileModel fileModel = new FileModel(session.getId(), presenterUserSession.getStartTimeStamp());
+                registry.addStream(fileModel);
 
                 RecorderEndpoint recorder = new RecorderEndpoint.Builder(pipeline, RECORDER_FILE_PATH)
                         .withMediaProfile(profile).build();
