@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UserRegistry {
 
-    private ConcurrentHashMap<String, Session> usersBySessionId = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, Session> usersBySessionId = new ConcurrentHashMap<>();
 
     public List<String> pastStreams = new ArrayList<>();
 

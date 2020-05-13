@@ -5,22 +5,20 @@
     <meta http-equiv="cache-control" content="no-cache">
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="expires" content="0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet"
           href="webjars/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet"
           href="webjars/ekko-lightbox/dist/ekko-lightbox.min.css">
-    <link rel="stylesheet" href="webjars/demo-console/index.css">
     <link rel="stylesheet" href="css/kurento.css">
-
     <script src="webjars/jquery/dist/jquery.min.js"></script>
     <script src="webjars/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="webjars/ekko-lightbox/dist/ekko-lightbox.min.js"></script>
     <script src="/webjars/webrtc-adapter/release/adapter.js"></script>
 
     <script src="js/kurento-utils.js"></script>
-    <script src="js/player.js"></script>
-    <title>Replay saved streams</title>
+    <script src="js/view.js"></script>
+    <title>View stream</title>
 </head>
 <body>
 <header>
@@ -40,44 +38,21 @@
     </nav>
 </header>
 
-<div class="row">
-    <div class="col-3 px-5">
-        <div class="page-header">
-            <h1>View played files</h1></div>
-        <div id="stream-list">
-
+<div class="row px-5">
+    <div class="col-3">
+        <div class="page-header py-2">
+            <h1>View live stream</h1>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <a id="start" href="#" class="btn btn-success"><span
-                        class="glyphicon glyphicon-play"></span> Start
-                </a>
-                <a id="pause" href="#" class="btn btn-primary">
-                    <span id="pause-icon" class="glyphicon glyphicon-pause"></span>
-                    <span id="pause-text">Pause </span>
+                <a id="viewer" href="#" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-user"></span> View
                 </a>
                 <a id="stop" href="#" class="btn btn-danger"><span
-                        class="glyphicon glyphicon-stop"></span> Stop</a>
+                        class="glyphicon glyphicon-stop"></span> Stop
+                </a>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <input type="text" id="videourl"
-                       value="http://files.openvidu.io/video/format/sintel.webm"
-                       style="width: 100%">
-            </div>
-        </div>
-        <br>
-
-        <div class="row">
-            <div class="col-md-6">
-                <span> Video duration (ms)</span>
-            </div>
-            <div class="col-md-6">
-                <input type="text" id="duration" style="width: 100%" disabled>
-            </div>
-        </div>
-        <br>
     </div>
     <div class="col-9">
         <div id="videoBig">
@@ -86,6 +61,5 @@
         </div>
     </div>
 </div>
-
 </body>
 </html>
