@@ -3,11 +3,19 @@ package hajussys.videostriiming.registry;
 import hajussys.videostriiming.models.Session;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserRegistry {
 
     private ConcurrentHashMap<String, Session> usersBySessionId = new ConcurrentHashMap<>();
+
+    public List<String> pastStreams = new ArrayList<>();
+
+    public void addStream(WebSocketSession session) {
+        pastStreams.add(session.getId());
+    }
 
     public void register(Session user) {
         usersBySessionId.put(user.getId(), user);

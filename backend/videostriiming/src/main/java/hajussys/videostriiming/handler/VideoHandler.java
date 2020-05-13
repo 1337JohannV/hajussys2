@@ -18,7 +18,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 
 public class VideoHandler extends TextWebSocketHandler {
-    private static final String RECORDER_FILE_PATH = "file:///tmp/HelloWorldRecorded.webm";
+    private String RECORDER_FILE_PATH;
     private static final Gson gson = new GsonBuilder().create();
     private final Logger log = LoggerFactory.getLogger(VideoHandler.class);
 
@@ -59,13 +59,10 @@ public class VideoHandler extends TextWebSocketHandler {
                 break;
             case "onIceCandidate": {
                 JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
-                System.out.println("CANDIDATE" + jsonCandidate.toString());
-
                 if (user != null) {
                     IceCandidate candidate = new IceCandidate(jsonCandidate.get("candidate").getAsString(),
                             jsonCandidate.get("sdpMid").getAsString(),
                             jsonCandidate.get("sdpMLineIndex").getAsInt());
-                    System.out.println(candidate + " CAND");
                     user.addCandidate(candidate);
                 }
                 break;
@@ -89,9 +86,9 @@ public class VideoHandler extends TextWebSocketHandler {
             MediaPipeline pipeline = kurento.createMediaPipeline();
             WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
             webRtcEndpoint.connect(webRtcEndpoint);
-
             MediaProfileSpecType profile = getMediaProfileFromMessage(jsonMessage);
-
+            RECORDER_FILE_PATH = String.format("file:///tmp/%s.webm", session.getId());
+            registry.addStream(session);
             RecorderEndpoint recorder = new RecorderEndpoint.Builder(pipeline, RECORDER_FILE_PATH)
                     .withMediaProfile(profile).build();
 
@@ -215,10 +212,19 @@ public class VideoHandler extends TextWebSocketHandler {
     private void play(Session user, final WebSocketSession session, JsonObject jsonMessage) {
         try {
 
-            // 1. Media logic
+            // 1. Media logic\
+
+            System.out.println(user + "USER");
+
             final MediaPipeline pipeline = kurento.createMediaPipeline();
+            System.out.println("PIPELINE: " + pipeline);
             WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
-            PlayerEndpoint player = new PlayerEndpoint.Builder(pipeline, RECORDER_FILE_PATH).build();
+            String path = jsonMessage.get("filepath") != null ? jsonMessage.get("filepath").getAsString() : null;
+            String pathString = String.format("file:///tmp/%s.webm", path);
+            System.out.println("PATHSTRING: "+pathString);
+            PlayerEndpoint player = new PlayerEndpoint
+                    .Builder(pipeline, path == null
+                    ? RECORDER_FILE_PATH : pathString ).build();
             player.connect(webRtcEndpoint);
 
             // Player listeners
@@ -227,11 +233,15 @@ public class VideoHandler extends TextWebSocketHandler {
                 sendPlayEnd(session, pipeline);
             });
             player.addEndOfStreamListener(event -> {
+
                 log.info("EndOfStreamEvent for session '{}'", session.getId());
                 sendPlayEnd(session, pipeline);
             });
 
             // 2. Store user session
+            if (user == null) {
+                user = new Session(session);
+            }
             user.setMediaPipeline(pipeline);
             user.setWebRtcEndpoint(webRtcEndpoint);
 
@@ -247,6 +257,7 @@ public class VideoHandler extends TextWebSocketHandler {
             webRtcEndpoint.addIceCandidateFoundListener(event -> {
                 JsonObject response1 = new JsonObject();
                 response1.addProperty("id", "iceCandidate");
+                log.info("ICE CANDIDATE FOUND {}", event.getCandidate());
                 response1.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
                 try {
                     synchronized (session) {

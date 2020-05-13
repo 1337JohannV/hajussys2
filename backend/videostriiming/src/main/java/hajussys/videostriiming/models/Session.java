@@ -17,6 +17,7 @@ public class Session {
     private RecorderEndpoint recorderEndpoint;
     private MediaPipeline mediaPipeline;
     private Date stopTimestamp;
+    private PlayerEndpoint playerEndpoint;
 
     public Session(WebSocketSession session) {
         this.id = session.getId();
@@ -40,6 +41,10 @@ public class Session {
 
     public void setRecorderEndpoint(RecorderEndpoint recorderEndpoint) {
         this.recorderEndpoint = recorderEndpoint;
+    }
+    public void setPlayerEndpoint (PlayerEndpoint playerEndpoint) {this.playerEndpoint = playerEndpoint;}
+    public PlayerEndpoint getPlayerEndpoint() {
+        return this.playerEndpoint;
     }
 
     public MediaPipeline getMediaPipeline() {

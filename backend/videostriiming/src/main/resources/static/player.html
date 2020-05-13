@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+          href="webjars/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="webjars/ekko-lightbox/dist/ekko-lightbox.min.css">
+    <link rel="stylesheet" href="webjars/demo-console/index.css">
+    <link rel="stylesheet" href="css/kurento.css">
+
+    <script src="webjars/jquery/dist/jquery.min.js"></script>
+    <script src="webjars/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="webjars/ekko-lightbox/dist/ekko-lightbox.min.js"></script>
+    <script src="/webjars/webrtc-adapter/release/adapter.js"></script>
+
+    <script src="js/kurento-utils.js"></script>
+    <script src="js/player.js"></script>
+    <title>Replay saved streams</title>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand">Striim.tv</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="index.html">Stream</a>
+                <a class="nav-item nav-link" href="#">View Stream</a>
+                <a class="nav-item nav-link" href="player.html">View past streams</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="row">
+    <div class="col-3 px-5">
+        <div class="page-header">
+            <h1>View played files</h1></div>
+        <div id="stream-list">
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a id="start" href="#" class="btn btn-success"><span
+                        class="glyphicon glyphicon-play"></span> Start
+                </a>
+                <a id="pause" href="#" class="btn btn-primary">
+                    <span id="pause-icon" class="glyphicon glyphicon-pause"></span>
+                    <span id="pause-text">Pause </span>
+                </a>
+                <a id="stop" href="#" class="btn btn-danger"><span
+                        class="glyphicon glyphicon-stop"></span> Stop</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <input type="text" id="videourl"
+                       value="http://files.openvidu.io/video/format/sintel.webm"
+                       style="width: 100%">
+            </div>
+        </div>
+        <br>
+
+        <div class="row">
+            <div class="col-md-6">
+                <span> Video duration (ms)</span>
+            </div>
+            <div class="col-md-6">
+                <input type="text" id="duration" style="width: 100%" disabled>
+            </div>
+        </div>
+        <br>
+    </div>
+    <div class="col-9">
+        <div id="videoBig">
+            <video id="video" autoplay width="1280px" height="720px"
+                   poster="img/webrtc.png"></video>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

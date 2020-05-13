@@ -28,7 +28,6 @@ const DISABLED = 3;
 const IN_PLAY = 4;
 
 window.onload = function() {
-	console = new Console();
 	console.log('Page loaded ...');
 	videoInput = document.getElementById('videoInput');
 	videoOutput = document.getElementById('videoOutput');
@@ -164,7 +163,7 @@ function startResponse(message) {
 
 	webRtcPeer.processAnswer(message.sdpAnswer, function(error) {
 		if (error)
-			return console.error(error);
+			console.log('error', error)
 	});
 }
 
