@@ -100,12 +100,34 @@ ws.onmessage = function(message) {
 	}
 }
 
-
+function replaceButton(isStarting) {
+    const buttonContainer = document.getElementById('index-button-container');
+    let currentButton;
+    if(isStarting){
+        currentButton = document.getElementById('start');
+        currentButton.remove();
+        buttonContainer.innerHTML += `<a
+                                              id="stop"
+                                              href="#"
+                                              class="btn btn-danger"
+                                              onclick="stop(); return false;">
+                                          Stop Streaming
+                                      </a>`
+    } else {
+        currentButton = document.getElementById('stop');
+        currentButton.remove();
+        buttonContainer.innerHTML += `<a
+                                              id="start"
+                                              href="#"
+                                              class="btn btn-success"
+                                              onclick="start(); return false;">
+                                          Start Streaming
+                                      </a>`
+    }
+}
 function start() {
 	console.log('Starting video call ...');
-
-	// Disable start button
-	setState(DISABLED);
+    replaceButton(true);
 	showSpinner(videoInput);
 	console.log('Creating WebRtcPeer and generating local sdp offer ...');
 
@@ -163,7 +185,7 @@ function startResponse(message) {
 function stop() {
 	const stopMessageId = 'stop';
 	console.log('Stopping video while in ' + state + '...');
-	setState(POST_CALL);
+	replaceButton(false);
 	if (webRtcPeer) {
 		webRtcPeer.dispose();
 		webRtcPeer = null;

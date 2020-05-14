@@ -66,6 +66,7 @@ ws.onmessage = function (message) {
 function start() {
     // Disable start button
     setState(I_AM_STARTING);
+    replaceButton(true);
     showSpinner(video);
 
     var mode = $('input[name="mode"]:checked').val();
@@ -162,12 +163,39 @@ function stop() {
         sendMessage(message);
     }
     hideSpinner(video);
+    replaceButton(false);
 }
 
+function replaceButton(isStarting) {
+    const buttonContainer = document.getElementById('player-button-container');
+    let currentButton;
+    if(isStarting){
+        currentButton = document.getElementById('start');
+        currentButton.remove();
+        buttonContainer.innerHTML += `<a
+                                              id="stop"
+                                              href="#"
+                                              class="btn btn-danger w-100"
+                                              onclick="stop(); return false;">
+                                          Stop
+                                      </a>`
+    } else {
+        currentButton = document.getElementById('stop');
+        currentButton.remove();
+        buttonContainer.innerHTML += `<a
+                                              id="start"
+                                              href="#"
+                                              class="btn btn-success w-100"
+                                              onclick="start(); return false;">
+                                          Play
+                                      </a>`
+    }
+}
 
 function playEnd() {
     setState(I_CAN_START);
     hideSpinner(video);
+    replaceButton(false);
 }
 
 function doSeek() {
