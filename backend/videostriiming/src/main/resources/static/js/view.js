@@ -1,4 +1,4 @@
-var ws = new WebSocket('ws://' + location.host + '/recording');
+var ws = new WebSocket('wss://' + '23.102.46.118:8443' + '/recording');
 var video;
 var webRtcPeer;
 

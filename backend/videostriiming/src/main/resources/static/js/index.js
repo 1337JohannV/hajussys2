@@ -15,7 +15,7 @@
  *
  */
 
-var ws = new WebSocket('ws://' + "localhost:8443" + '/recording');
+var ws = new WebSocket('wss://' + "23.102.46.118:8443" + '/recording');
 var videoInput;
 var videoOutput;
 var videoOutput2;

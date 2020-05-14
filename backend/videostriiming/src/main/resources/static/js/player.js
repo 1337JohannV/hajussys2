@@ -1,4 +1,4 @@
-var ws = new WebSocket('ws://' + location.host + '/player');
+var ws = new WebSocket('wss://23.102.46.118:8443/player');
 var video;
 var webRtcPeer;
 var state = null;
@@ -326,7 +326,7 @@ function displayStreams(array) {
 }
 
 function getStreams() {
-    fetch('http://localhost:8443/past-streams', {method: 'GET', headers: {'Content-Type': 'application/json'}}).then(
+    fetch('https://23.102.46.118:8443/past-streams', {method: 'GET', headers: {'Content-Type': 'application/json'}}).then(
         response => response.json() .then(data => {
                 console.log("STREAMS RESPONSE", data);
                 displayStreams(data);
