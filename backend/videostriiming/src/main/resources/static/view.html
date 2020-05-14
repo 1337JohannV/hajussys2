@@ -37,27 +37,46 @@
         </div>
     </nav>
 </header>
-
-<div class="row px-5">
-    <div class="col-3">
-        <div class="page-header py-2">
-            <h1>View live stream</h1>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <a id="viewer" href="#" class="btn btn-primary">
-                    <span class="glyphicon glyphicon-user"></span> View
-                </a>
-                <a id="stop" href="#" class="btn btn-danger"><span
-                        class="glyphicon glyphicon-stop"></span> Stop
-                </a>
+<div class="row m-0 justify-content-center">
+    <div class="col-9">
+        <div class="row py-2 px-5">
+            <div class="col px-4">
+                <h3 class="pl-2">View live stream</h3>
+            </div>
+            <div class="col-auto px-4">
+                <div class="row">
+                    <div class="col pr-4">
+                        <a
+                                id="viewer"
+                                href="#"
+                                class="btn btn-primary w-100">
+                            View Stream
+                        </a>
+                    </div>
+                    <div class="col pr-4">
+                        <a
+                                id="stop"
+                                href="#"
+                                class="btn btn-danger w-100">
+                            Stop Viewing
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-9">
-        <div id="videoBig">
-            <video id="video" autoplay width="1280px" height="720px"
-                   poster="img/webrtc.png"></video>
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <div id="videoBig">
+                    <video
+                            class="m-0"
+                            id="video"
+                            autoplay width="1280px"
+                            height="720px"
+                            poster="img/webrtc.png">
+
+                    </video>
+                </div>
+            </div>
         </div>
     </div>
 </div>
