@@ -36,7 +36,6 @@ public class VideoHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
 
-        // log.info("Incoming message: {}", jsonMessage);
 
         Session user = registry.getBySession(session);
         if (user != null) {
@@ -58,7 +57,6 @@ public class VideoHandler extends TextWebSocketHandler {
                 stop(session);
                 break;
             case "viewer":
-                log.info("CASE ON VIEWER!!!!!!!!!!!!!!!! {}", jsonMessage);
                 try {
                     viewer(session, jsonMessage);
                 } catch (Throwable t) {
@@ -66,11 +64,7 @@ public class VideoHandler extends TextWebSocketHandler {
                 }
                 break;
             case "onIceCandidate":
-                log.info("JSON MESSAGE!!!!!!!!!!!: {}", jsonMessage);
                 JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
-                log.info("Peale seda sitta");
-                System.out.println("CANDIDATE" + jsonCandidate.toString());
-
 
                 if (presenterUserSession != null) {
                     if (presenterUserSession.getSession() == session) {
@@ -120,7 +114,6 @@ public class VideoHandler extends TextWebSocketHandler {
     private synchronized void start(final WebSocketSession session, JsonObject jsonMessage) {
         try {
 
-            // 1. Media logic (webRtcEndpoint in loopback)
             if (presenterUserSession == null) {
                 presenterUserSession = new Session(session);
 
@@ -128,7 +121,6 @@ public class VideoHandler extends TextWebSocketHandler {
                 presenterUserSession.setWebRtcEndpoint(new WebRtcEndpoint.Builder(pipeline).build());
                 WebRtcEndpoint webRtcEndpoint = presenterUserSession.getWebRtcEndpoint();
 
-                // WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
                 webRtcEndpoint.connect(webRtcEndpoint);
 
                 MediaProfileSpecType profile = getMediaProfileFromMessage(jsonMessage);
@@ -179,18 +171,15 @@ public class VideoHandler extends TextWebSocketHandler {
 
                 connectAccordingToProfile(webRtcEndpoint, recorder, profile);
 
-                // 2. Store user session
                 Session user = new Session(session);
                 user.setMediaPipeline(pipeline);
                 user.setWebRtcEndpoint(webRtcEndpoint);
                 user.setRecorderEndpoint(recorder);
                 registry.register(user);
 
-                // 3. SDP negotiation
                 String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
                 String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
 
-                // 4. Gather ICE candidates
                 webRtcEndpoint.addIceCandidateFoundListener(event -> {
                     JsonObject response = new JsonObject();
                     response.addProperty("id", "iceCandidate");
@@ -264,7 +253,7 @@ public class VideoHandler extends TextWebSocketHandler {
                 webRtcEndpoint.connect(recorder, MediaType.VIDEO);
                 break;
             default:
-                throw new UnsupportedOperationException("Unsupported profile for this tutorial: " + profile);
+                throw new UnsupportedOperationException("Unsupported profile: " + profile);
         }
     }
 
@@ -341,7 +330,6 @@ public class VideoHandler extends TextWebSocketHandler {
 
 
     private synchronized void stop(WebSocketSession session) throws IOException {
-        log.info("REMOVING VIEW SESSION");
         String sessionId = session.getId();
         if (presenterUserSession != null && presenterUserSession.getSession().getId().equals(sessionId)) {
             log.info("Releasing media pipeline");
